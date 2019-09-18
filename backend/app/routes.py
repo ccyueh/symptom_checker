@@ -28,7 +28,7 @@ def getDiagnosis():
 
                 frequency = {}
                 for k, v in diagnosis_counts.items():
-                    frequency[k] = v/len(diagnoses)
+                    frequency[k[1]] = v/len(diagnoses)
 
                 return jsonify({ 
                     'diagnosis': diagnosis, 
@@ -53,12 +53,15 @@ def saveDiagnosis():
         symptom = db.session.query(Symptom).filter_by(symptom_id=symptom_id).first()
         diagnosis = db.session.query(Diagnosis).filter_by(diagnosis_id=diagnosis_id).first()
         
-        symptom.diagnoses.append(diagnosis)
+        if symptom and diagnosis:
+            symptom.diagnoses.append(diagnosis)
+            
+            db.session.add(symptom)
+            db.session.commit()
 
-        db.session.add(symptom)
-        db.session.commit()
-    
-        return jsonify({ 'success': 'Diagnosis saved.' })
+            return jsonify({ 'success': 'Diagnosis saved.' })
+        else:
+            return jsonify({ 'error': 'Symptom and/or diagnosis not found.' })
     else:
         return jsonify({ 'error': 'Symptom and diagnosis IDs are required.' })
 
