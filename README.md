@@ -27,16 +27,16 @@ The API provides information about possible diagnoses for several symptoms, as w
 
 #### Endpoints
 
-#####GET api/symptoms/retrieve
+##### GET api/symptoms/retrieve
 
 Returns all symptoms in the database.
 
-Parameters: None
+**Parameters:** None
 
-Sample request:
+**Sample request:**
 `curl "http://localhost:5000/api/symptoms/retrieve"`
 
-Sample response:
+**Sample response:**
 ```
 {
   "symptoms": [
@@ -57,18 +57,18 @@ Sample response:
 ```
 Each symptom is returned in [symptom_id, symptom_name] format.
 
-#####GET api/diagnoses/retrieve
+##### GET api/diagnoses/retrieve
 
 Returns most likely diagnosis, alternative diagnoses, and diagnosis frequencies for a given symptom. 
 
-Parameters (Required):
-symptom_id (Integer)
+**Parameters (Required):**
+*symptom_id (Integer)*
 The ID of the symptom.
 
-Sample request:
+**Sample request:**
 `curl "http://localhost:5000/api/diagnoses/retrieve?symptom_id=1"`
 
-Sample response:
+**Sample response:**
 ```
 {
   "alternatives": [
@@ -124,27 +124,27 @@ Sample response:
 ```
 Diagnosis and alternatives are given in [diagnosis_id,diagnosis_name] format, with alternatives being a list. Frequency is given as a dictionary with diagnosis names as the keys and diagnosis frequency as the values.
 
-#####POST api/diagnoses/save
+##### POST api/diagnoses/save
 Adds a new record of a diagnosis for a symptom.
 
-Parameters (Required):
-symptom_id (Integer)
+**Parameters (Required):**
+*symptom_id (Integer)*
 The ID of the symptom.
 
-diagnosis_id (Integer)
+*diagnosis_id (Integer)*
 The ID of the diagnosis.
 
-Sample request:
+**Sample request:**
 `curl -i -X POST -H "Content-Type:application/json" http://localhost:5000/api/diagnoses/save -d '{"symptom_id":1,"diagnosis_id":11}'`
 
-Sample response:
+**Sample response:**
 ```
 {
   "success": "Diagnosis saved."
 }
 ```
 
-####Testing
+#### Testing
 
 Run `pytest` to run the API tests. 
 
