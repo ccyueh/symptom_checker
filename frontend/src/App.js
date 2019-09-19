@@ -20,6 +20,7 @@ class App extends Component {
     }
   }
 
+  // gets all symptoms
   getSymptoms = async() => {
     const URL = 'http://localhost:5000/api/symptoms/retrieve';
 
@@ -36,6 +37,7 @@ class App extends Component {
     }
   }
 
+  // gets possible diagnoses and their frequencies based on symptom
   getDiagnoses = async(e) => {
     e.preventDefault()
 
@@ -62,6 +64,7 @@ class App extends Component {
     }
   }
 
+  // adds new diagnosis to database
   saveDiagnosis = async(symptom_id, diagnosis_id) => {
     const URL = 'http://localhost:5000/api/diagnoses/save';
 
@@ -94,6 +97,7 @@ class App extends Component {
     this.setState({ 'show_alternatives': true});
   }
 
+  // sets diagnosis to newly chosen diagnosis and hides alternative diagnoses dropdown/allows diagnosis frequency to be displayed
   setDiagnosis = e => {
     e.preventDefault();
 
@@ -106,6 +110,7 @@ class App extends Component {
     });
   }
 
+  // return to initial state for new user
   reset = e => {
     this.setState({
       'diagnosis': [],
@@ -117,6 +122,7 @@ class App extends Component {
   }
 
   async componentDidMount() {
+    // get all symptoms from API for initial dropdown menu
     let symptoms = await this.getSymptoms();
     this.setState({ symptoms });
   }

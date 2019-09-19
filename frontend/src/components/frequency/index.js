@@ -4,7 +4,7 @@ import './index.css';
 function Frequency(props) {
   return (
     <div>
-      <p>Thank you for confirming your diagnosis. Here is likelihood of each diagnosis for your symptom:</p>
+      <p>Thank you for confirming your diagnosis. Here is the likelihood of each diagnosis for your symptom:</p>
       <table className="table">
         <thead>
           <tr>
@@ -13,6 +13,7 @@ function Frequency(props) {
           </tr>
         </thead>
         <tbody>
+          {/* Generate a row for each diagnosis frequency, with the chosen diagnosis highlighted. Display frequency as rounded percentages. */}
           {Object.keys(props.frequency).map((freq, index) =>
             <tr
               key={index}
