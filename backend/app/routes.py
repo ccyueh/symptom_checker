@@ -1,7 +1,7 @@
 from app import app, db
 import os
 from flask import request, jsonify
-from app.models import Symptom, Diagnosis, symptom_diagnosis
+from app.models import Symptom, Diagnosis, Record
 from collections import Counter
 
 @app.route('/')
@@ -13,12 +13,12 @@ def getDiagnosis():
     symptom_id = request.args.get('symptom_id')
 
     if symptom_id:
-        result = Symptom.query.filter_by(symptom_id=symptom_id).first()
-        if result:
-            diagnoses = [(d.diagnosis_id,d.diagnosis_name) for d in result.diagnoses]
+        symptom = Symptom.query.filter_by(symptom_id=symptom_id).first()
+        if symptom:
+            records = db.session.query(Record.record_id, Record.symptom_id, Diagnosis.diagnosis_id, Diagnosis.diagnosis_name).join(Record).filter_by(symptom_id=symptom_id).all()
+            diagnoses = [(d.diagnosis_id,d.diagnosis_name) for d in records]
             diagnosis_counts = Counter(diagnoses)
-            top_diagnoses = sorted(diagnosis_counts, key=lambda x:x[1])
-            
+            top_diagnoses = diagnosis_counts.most_common()
             if len(top_diagnoses) > 0:
                 diagnosis = top_diagnoses[0]
                 if len(top_diagnoses) > 1:
@@ -29,7 +29,7 @@ def getDiagnosis():
                 frequency = {}
                 for k, v in diagnosis_counts.items():
                     frequency[k[1]] = v/len(diagnoses)
-
+    
                 return jsonify({ 
                     'diagnosis': diagnosis, 
                     'alternatives': alternatives, 
@@ -54,9 +54,9 @@ def saveDiagnosis():
         diagnosis = db.session.query(Diagnosis).filter_by(diagnosis_id=diagnosis_id).first()
         
         if symptom and diagnosis:
-            symptom.diagnoses.append(diagnosis)
+            record = Record(symptom_id=symptom_id, diagnosis_id=diagnosis_id)
             
-            db.session.add(symptom)
+            db.session.add(record)
             db.session.commit()
 
             return jsonify({ 'success': 'Diagnosis saved.' })
