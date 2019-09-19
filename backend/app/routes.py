@@ -11,7 +11,7 @@ def index():
 @app.route('/api/symptoms/retrieve', methods=['GET'])
 def getSymptoms():
     results = db.session.query(Symptom).all()
-    symptoms = [(s.symptom_id, s.symptom_name) for s in results]
+    symptoms = [(s.symptom_id, s.symptom_name.title()) for s in results]
     
     return jsonify({ 'symptoms': symptoms })
 
@@ -23,13 +23,13 @@ def getDiagnosis():
         symptom = Symptom.query.filter_by(symptom_id=symptom_id).first()
         if symptom:
             records = db.session.query(Record.record_id, Record.symptom_id, Diagnosis.diagnosis_id, Diagnosis.diagnosis_name).join(Record).filter_by(symptom_id=symptom_id).all()
-            diagnoses = [(d.diagnosis_id,d.diagnosis_name) for d in records]
+            diagnoses = [(d.diagnosis_id,d.diagnosis_name.title()) for d in records]
             diagnosis_counts = Counter(diagnoses)
             top_diagnoses = diagnosis_counts.most_common()
             if len(top_diagnoses) > 0:
-                diagnosis = top_diagnoses[0]
+                diagnosis = top_diagnoses[0][0]
                 if len(top_diagnoses) > 1:
-                    alternatives = top_diagnoses[1:]
+                    alternatives = [d[0] for d in top_diagnoses[1:]]
                 else:
                     alternatives = []
 
