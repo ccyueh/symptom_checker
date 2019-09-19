@@ -7,7 +7,7 @@ function Diagnosis(props) {
       <h2 className="blue">Diagnosis:</h2>
       <h3>{props.diagnosis[1]}</h3>
       <h4>Is this diagnosis correct?</h4>
-      {/* Show frequency is diagnosis is correct; otherwise choose another diagnosis. */}
+      {/* Show frequency if diagnosis is correct; otherwise choose another diagnosis. */}
       <button
         className="btn btn-primary"
         onClick={props.showFrequency}
