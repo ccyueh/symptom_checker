@@ -1,68 +1,157 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Symptom Checker
 
-## Available Scripts
+### Installation
 
-In the project directory, you can run:
+This project uses Flask and React.
 
-### `npm start`
+1. `pip install flask flask-cors flask-sqlalchemy flask-migrate pytest`
+2. `npm install -g create-react-app`
 
-Runs the app in the development mode.<br>
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+### Development
 
-The page will reload if you make edits.<br>
-You will also see any lint errors in the console.
+In the `backend/` directory:
+1. `export FLASK_APP=main.py`
+2. `export FLASK_DEBUG=1`
+3. `flask run`
 
-### `npm test`
+The backend API should be running at [http://localhost:5000/](http://localhost:5000/).
 
-Launches the test runner in the interactive watch mode.<br>
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+In the `frontend/` directory:
+1. `npm start`
 
-### `npm run build`
+Open [http://localhost:3000](http://localhost:3000) to view the project.
 
-Builds the app for production to the `build` folder.<br>
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### API Documentation
 
-The build is minified and the filenames include the hashes.<br>
-Your app is ready to be deployed!
+The API provides information about possible diagnoses for several symptoms, as well as how frequently each diagnosis is associated with each symptom.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+#### Endpoints
 
-### `npm run eject`
+#####GET api/symptoms/retrieve
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+Returns all symptoms in the database.
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Parameters: None
 
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+Sample request:
+`curl "http://localhost:5000/api/symptoms/retrieve"`
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+Sample response:
+```
+{
+  "symptoms": [
+    [
+      1, 
+      "Sore Throat"
+    ], 
+    [
+      2, 
+      "Itchy Rash"
+    ], 
+    [
+      3, 
+      "Runny Nose"
+    ]
+  ]
+}
+```
+Each symptom is returned in [symptom_id, symptom_name] format.
 
-## Learn More
+#####GET api/diagnoses/retrieve
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+Returns most likely diagnosis, alternative diagnoses, and diagnosis frequencies for a given symptom. 
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+Parameters (Required):
+symptom_id (Integer)
+The ID of the symptom.
 
-### Code Splitting
+Sample request:
+`curl "http://localhost:5000/api/diagnoses/retrieve?symptom_id=1"`
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
+Sample response:
+```
+{
+  "alternatives": [
+    [
+      1, 
+      "Acid Reflux Disease"
+    ], 
+    [
+      6, 
+      "Bronchitis"
+    ], 
+    [
+      21, 
+      "Seasonal Allergies"
+    ], 
+    [
+      24, 
+      "Strep Throat"
+    ], 
+    [
+      27, 
+      "Viral Throat Infection"
+    ], 
+    [
+      2, 
+      "Acute Bacterial Sinusitis"
+    ], 
+    [
+      15, 
+      "Middle Ear Infection"
+    ], 
+    [
+      16, 
+      "Mononucleosis Infection"
+    ]
+  ], 
+  "diagnosis": [
+    11, 
+    "Common Cold"
+  ], 
+  "frequency": {
+    "Acid Reflux Disease": 0.2, 
+    "Acute Bacterial Sinusitis": 0.04, 
+    "Bronchitis": 0.12, 
+    "Common Cold": 0.32, 
+    "Middle Ear Infection": 0.04, 
+    "Mononucleosis Infection": 0.04, 
+    "Seasonal Allergies": 0.08, 
+    "Strep Throat": 0.08, 
+    "Viral Throat Infection": 0.08
+  }
+}
+```
+Diagnosis and alternatives are given in [diagnosis_id,diagnosis_name] format, with alternatives being a list. Frequency is given as a dictionary with diagnosis names as the keys and diagnosis frequency as the values.
 
-### Analyzing the Bundle Size
+#####POST api/diagnoses/save
+Adds a new record of a diagnosis for a symptom.
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
+Parameters (Required):
+symptom_id (Integer)
+The ID of the symptom.
 
-### Making a Progressive Web App
+diagnosis_id (Integer)
+The ID of the diagnosis.
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
+Sample request:
+`curl -i -X POST -H "Content-Type:application/json" http://localhost:5000/api/diagnoses/save -d '{"symptom_id":1,"diagnosis_id":11}'`
 
-### Advanced Configuration
+Sample response:
+```
+{
+  "success": "Diagnosis saved."
+}
+```
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
+####Testing
 
-### Deployment
+Run `pytest` to run the API tests. 
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
+Each endpoint is tested to make sure it is valid. 
 
-### `npm run build` fails to minify
+For symptoms, it cannot be an empty list (since users must be able to choose a symptom) and both symptom ID and name must be given.
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+For diagnoses, both valid and invalid symptom IDs were tested for formatting and expected values.
+
+For saving diagnoses, both valid and invalid symptom/diagnosis IDs were tested.
