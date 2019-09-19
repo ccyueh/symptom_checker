@@ -8,6 +8,13 @@ from collections import Counter
 def index():
     return ''
 
+@app.route('/api/symptoms/retrieve', methods=['GET'])
+def getSymptoms():
+    results = db.session.query(Symptom).all()
+    symptoms = [(s.symptom_id, s.symptom_name) for s in results]
+    
+    return jsonify({ 'symptoms': symptoms })
+
 @app.route('/api/diagnoses/retrieve', methods=['GET'])
 def getDiagnosis():
     symptom_id = request.args.get('symptom_id')
