@@ -1,2 +1,5 @@
-frontend/
-backend/
+*venv/
+*migrations/
+*__pycache__/
+*pyc
+
